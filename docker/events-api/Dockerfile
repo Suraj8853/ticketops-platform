@@ -1,15 +1,15 @@
 FROM node:20 AS builder
 WORKDIR /app
 COPY package.json ./
-RUN npm ci
+RUN npm install
 COPY . .
 
-FROM node:20-alpine as production
+FROM node:20-alpine AS production
 WORKDIR /app
 RUN  addgroup -g 1001 -S nodejs && \
     adduser -S nodejs -u 1001 
 COPY package*.json .
-RUN npm ci --production
+RUN npm install --only=production
 COPY --from=builder /app/src ./src
 RUN chown -R nodejs:nodejs /app
 USER nodejs
