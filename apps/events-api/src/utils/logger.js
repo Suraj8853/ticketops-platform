@@ -6,7 +6,7 @@ const logger = winston.createLogger({
     winston.format.timestamp(),
     winston.format.json()
   ),
-  defaultMeta: { service: 'admin-api' },
+  defaultMeta: { service: 'events-api' },
   transports: [new winston.transports.Console()],
 });
 
