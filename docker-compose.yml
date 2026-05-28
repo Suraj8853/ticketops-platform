@@ -1,0 +1,119 @@
+version: '3.8'
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: ticketops-postgres
+    environment:
+      POSTGRES_DB: ticketops
+      POSTGRES_USER: ticketops
+      POSTGRES_PASSWORD: ticketops
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./apps/events-api/src/models/schema.sql:/docker-entrypoint-initdb.d/schema.sql
+    healthcheck:
+      test: ["CMD-SHELL","pg_isready -U ticketops"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+  redis:
+    image: redis:7-alpine
+    container_name: ticketops-redis
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD","redis-cli","ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  events-api:
+    build:
+      context: ./apps/events-api
+      dockerfile: ../../docker/events-api/Dockerfile
+    container_name: ticketops-event-api
+    ports:
+      - "3000:3000"
+    environment:
+      PORT: 3000
+      NODE_ENV: development
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: ticketops
+      DB_USER: ticketops
+      DB_PASSWORD: ticketops
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      SEAT_LOCK_TTL: 600
+      LOG_LEVEL: info
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    restart: on-failure
+  bookings-worker:
+    build:
+      context: ./apps/bookings-worker
+      dockerfile: ../../docker/bookings-worker/Dockerfile
+    container_name: ticketops-bookings-worker
+    environment:
+      NODE_ENV: development
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: ticketops
+      DB_USER: ticketops
+      DB_PASSWORD: ticketops
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      QUEUE_NAME: bookings:queue
+      AWS_REGION: ap-south-1
+      AWS_S3_BUCKET: ticketops-qr-codes
+      SES_FROM_EMAIL: noreply@ticketops.com
+      LOG_LEVEL: info
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    restart: on-failure
+
+  admin-api:
+    build:
+      context: ./apps/admin-api
+      dockerfile: ../../docker/admin-api/Dockerfile
+    container_name: ticketops-admin-api
+    ports:
+      - "4000:4000"
+    environment:
+      PORT: 4000
+      NODE_ENV: development
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: ticketops
+      DB_USER: ticketops
+      DB_PASSWORD: ticketops
+      ADMIN_API_KEY: supersecretadminapikey
+      LOG_LEVEL: info
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: on-failure
+
+  dashboard:
+    build:
+      context: ./apps/dashboard
+      dockerfile: ../../docker/dashboard/Dockerfile
+    container_name: ticketops-dashboard
+    ports:
+      - "5173:80"
+    depends_on:
+      - events-api
+      - admin-api
+    restart: on-failure
+volumes:
+  postgres_data:
+    driver: local
+
+  
