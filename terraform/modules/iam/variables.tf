@@ -1,0 +1,24 @@
+variable "project" {
+  description = "project name"
+  type = string
+}
+
+variable "env" {
+  description = "Environment name"
+  type        = string
+}
+
+variable "github_org" {
+  description = "github organization or user name"
+  type = string
+}
+
+variable "github_repo" {
+   description = "GitHub repository name"
+   type        = string
+}
+
+variable "aws_account_id" {
+   description = "AWS account ID"
+  type        = string
+}
