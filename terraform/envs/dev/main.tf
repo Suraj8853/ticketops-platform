@@ -13,3 +13,27 @@ module "ecr" {
   project = var.project
   env = var.env
 }
+
+module "iam" {
+  source = "../../modules/iam"
+  project = var.project
+  github_repo = var.github_repo
+  env = var.env
+  github_org = var.github_org
+  aws_account_id = var.aws_account_id
+
+}
+
+module "eks" {
+  source = "../../modules/eks"
+  project = var.project
+  eks_cluster_role_arn = module.iam.cluster_role_arn
+  private_subnets_ids = module.vpc.private_subnet_ids
+  public_subnets_ids = module.vpc.public_subnet_ids
+ env = var.env
+ eks_node_role_arn = module.iam.eks_node_role_arn
+ node_desired_size = 2
+ node_min_size = 1
+ node_max_size = 4
+ node_instance_type = "t3.medium"
+}
