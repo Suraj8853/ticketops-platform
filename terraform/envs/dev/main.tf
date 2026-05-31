@@ -37,3 +37,18 @@ module "eks" {
  node_max_size = 4
  node_instance_type = "t3.medium"
 }
+
+
+module "rds" {
+source = "../../modules/rds"
+private_subnet_ids = module.vpc.private_subnet_ids
+vpc_id = module.vpc.vpc_id
+eks_node_security_group_id = module.eks.eks_node_security_group_id
+project = var.project
+env = var.env
+db_username = var.db_username
+db_password = var.db_password
+db_name = var.db_name
+db_allocated_storage = var.db_allocated_storage
+
+}

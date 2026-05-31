@@ -22,3 +22,8 @@ output "node_group_name" {
   description = "eks node group name"
   value = aws_eks_node_group.main.node_group_name
 }
+
+output "eks_node_security_group_id" {
+  description = "security group id for the eks"
+  value = aws_eks_cluster.main.vpc_config[0].cluster_security_group_id
+}

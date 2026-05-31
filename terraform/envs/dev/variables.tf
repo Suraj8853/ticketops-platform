@@ -42,3 +42,24 @@ variable "github_org" {
   type = string
 }
 
+
+variable "db_username" {
+   description = "RDS master password"
+  type = string
+}
+
+variable "db_password" {
+   description = "RDS master password"
+  type = string
+}
+
+variable "db_name" {
+    description = "RDS DB"
+  type = string
+}
+variable "db_allocated_storage" {
+    description = "allocated db storage"
+  type = number
+  default = 20
+}
+
