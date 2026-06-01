@@ -52,3 +52,15 @@ db_name = var.db_name
 db_allocated_storage = var.db_allocated_storage
 
 }
+
+
+module "elasticache" {
+  source = "../../modules/elasticache"
+  env = var.env
+  project = var.project
+  vpc_id = module.vpc.vpc_id
+  eks_node_security_group_id = module.eks.eks_node_security_group_id
+  private_subnets_ids = module.vpc.private_subnet_ids
+  
+
+}
