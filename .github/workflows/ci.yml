@@ -20,13 +20,13 @@ jobs:
       matrix:
         service:
           - name: events-api
-            context: ./docker/events-api
+            context: ./apps/events-api
           - name: bookings-worker
-            context: ./docker/bookings-worker
+            context: ./apps/bookings-worker
           - name: dashboard
-            context: ./docker/dashboard
+            context: ./apps/dashboard
           - name: admin-api
-            context: ./docker/admin-api 
+            context: ./apps/admin-api 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
