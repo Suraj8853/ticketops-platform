@@ -71,3 +71,16 @@ resource "aws_secretsmanager_secret_version" "db_password" {
   secret_id = aws_secretsmanager_secret.db_password.id
   secret_string = var.db_password
 }
+
+resource "aws_secretsmanager_secret" "db_host" {
+  name = "${var.project}-${var.env}-secretmanager-db-host"
+  recovery_window_in_days = 0
+  tags = {
+    Name = "${var.project}-${var.env}-db-password"
+  }
+}
+
+resource "aws_secretsmanager_secret_version" "db_host" {
+  secret_id = aws_secretsmanager_secret.db_host.id
+  secret_string = aws_db_instance.rds.address
+}

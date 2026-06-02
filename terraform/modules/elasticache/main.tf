@@ -40,3 +40,16 @@ resource "aws_elasticache_cluster" "main" {
     Name = "${var.project}-${var.env}-redis-cluster"
   }
 }
+
+resource "aws_secretsmanager_secret" "redis_host" {
+  name = "${var.project}-${var.env}-redis-host"
+  recovery_window_in_days = 0
+  tags = {
+    Name = "${var.project}-${var.env}-redis-host"
+  }
+}
+
+resource "aws_secretsmanager_secret_version" "redis_host" {
+  secret_id = aws_secretsmanager_secret.redis_host.id
+  secret_string = aws_elasticache_cluster.main.cache_nodes[0].address
+}
