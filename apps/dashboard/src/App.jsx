@@ -4,8 +4,10 @@ import Navbar from './components/layout/Navbar';
 import EventsPage from './pages/EventsPage';
 import EventDetailPage from './pages/EventDetailPage';
 import AdminPage from './pages/AdminPage';
+import LoginPage from './pages/LoginPage';
 import ConfirmPage from './pages/ConfirmPage';
 import NotFoundPage from './pages/NotFoundPage';
+import ProtectedRoute from './components/auth/ProtectedRoute';
 
 const App = () => (
   <div>
@@ -14,7 +16,12 @@ const App = () => (
       <Route path="/" element={<EventsPage />} />
       <Route path="/events/:id" element={<EventDetailPage />} />
       <Route path="/confirm" element={<ConfirmPage />} />
-      <Route path="/admin" element={<AdminPage />} />
+      <Route path="/login" element={<LoginPage />} />
+      <Route path="/admin" element={
+        <ProtectedRoute>
+          <AdminPage />
+        </ProtectedRoute>
+      } />
       <Route path="*" element={<NotFoundPage />} />
     </Routes>
   </div>
