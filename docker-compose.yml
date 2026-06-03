@@ -17,6 +17,7 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
+
   redis:
     image: redis:7-alpine
     container_name: ticketops-redis
@@ -31,8 +32,7 @@ services:
   events-api:
     build:
       context: ./apps/events-api
-      dockerfile: ../../docker/events-api/Dockerfile
-    container_name: ticketops-event-api
+    container_name: ticketops-events-api
     ports:
       - "3000:3000"
     environment:
@@ -53,10 +53,10 @@ services:
       redis:
         condition: service_healthy
     restart: on-failure
+
   bookings-worker:
     build:
       context: ./apps/bookings-worker
-      dockerfile: ../../docker/bookings-worker/Dockerfile
     container_name: ticketops-bookings-worker
     environment:
       NODE_ENV: development
@@ -82,7 +82,6 @@ services:
   admin-api:
     build:
       context: ./apps/admin-api
-      dockerfile: ../../docker/admin-api/Dockerfile
     container_name: ticketops-admin-api
     ports:
       - "4000:4000"
@@ -94,7 +93,9 @@ services:
       DB_NAME: ticketops
       DB_USER: ticketops
       DB_PASSWORD: ticketops
-      ADMIN_API_KEY: supersecretadminapikey
+      JWT_SECRET: local-dev-secret-change-in-production
+      ADMIN_EMAIL: admin@ticketops.com
+      ADMIN_PASSWORD: Admin#2026!
       LOG_LEVEL: info
     depends_on:
       postgres:
@@ -104,7 +105,6 @@ services:
   dashboard:
     build:
       context: ./apps/dashboard
-      dockerfile: ../../docker/dashboard/Dockerfile
     container_name: ticketops-dashboard
     ports:
       - "5173:80"
@@ -112,8 +112,7 @@ services:
       - events-api
       - admin-api
     restart: on-failure
+
 volumes:
   postgres_data:
     driver: local
-
-  

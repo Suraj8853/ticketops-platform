@@ -53,3 +53,6 @@ resource "aws_secretsmanager_secret_version" "redis_host" {
   secret_id = aws_secretsmanager_secret.redis_host.id
   secret_string = aws_elasticache_cluster.main.cache_nodes[0].address
 }
+
+
+
