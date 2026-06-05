@@ -6,9 +6,10 @@ const pool = new Pool({
   database: process.env.DB_NAME || 'ticketops',
   user: process.env.DB_USER || 'ticketops',
   password: process.env.DB_PASSWORD || 'ticketops',
-  max: 10,
+  max: 20,
   idleTimeoutMillis: 30000,
   connectionTimeoutMillis: 2000,
+  ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
 });
 
 pool.on('error', (err) => {
