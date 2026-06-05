@@ -21,6 +21,7 @@ module "iam" {
   env = var.env
   github_org = var.github_org
   aws_account_id = var.aws_account_id
+  eks_oidc_issuer_url = module.eks.cluster_oidc_issuer_url
 
 }
 
@@ -63,4 +64,12 @@ module "elasticache" {
   private_subnets_ids = module.vpc.private_subnet_ids
   
 
+}
+
+module "app_secrets" {
+  source = "../../modules/app-secrets"
+  admin_password = var.admin_password
+  project = var.project
+  env = var.env
+  
 }

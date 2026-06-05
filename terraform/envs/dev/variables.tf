@@ -63,3 +63,8 @@ variable "db_allocated_storage" {
   default = 20
 }
 
+variable "admin_password" {
+  description = "Default admin password"
+  type        = string
+  sensitive   = true
+}

@@ -22,3 +22,8 @@ variable "aws_account_id" {
    description = "AWS account ID"
   type        = string
 }
+
+variable "eks_oidc_issuer_url" {
+  description = "EKS OIDC issuer URL"
+  type        = string
+}

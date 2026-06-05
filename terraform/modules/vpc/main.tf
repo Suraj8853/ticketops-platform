@@ -24,6 +24,7 @@ resource "aws_subnet" "public" {
   tags = {
     Name = "${var.project}-${var.env}-public-${var.availablity_zones[count.index]}"
      "kubernetes.io/role/elb" = "1"
+     "kubernetes.io/cluster/${var.project}-${var.env}-cluster" = "shared"
   }
 }
 
@@ -37,6 +38,7 @@ resource "aws_subnet" "private" {
      tags = {
        Name = "${var.project}-${var.env}-private-${var.availablity_zones[count.index]}"
         "kubernetes.io/role/internal-elb" = "1"
+        "kubernetes.io/cluster/${var.project}-${var.env}-cluster" = "shared"
      }
   
 }
@@ -94,3 +96,4 @@ resource "aws_route_table_association" "private" {
     subnet_id = aws_subnet.private[count.index].id
   
 }
+

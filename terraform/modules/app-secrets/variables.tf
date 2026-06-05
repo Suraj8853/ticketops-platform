@@ -8,11 +8,6 @@ variable "env" {
   type        = string
 }
 
-variable "jwt_secret" {
-  description = "JWT signing secret"
-  type        = string
-  sensitive   = true
-}
 
 variable "admin_password" {
   description = "Default admin password"

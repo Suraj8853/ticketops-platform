@@ -7,6 +7,17 @@ resource "aws_iam_openid_connect_provider" "github" {
   }
 }
 
+resource "aws_iam_openid_connect_provider" "eks" {
+  url = "https://oidc.eks.ap-south-1.amazonaws.com/id/B6F84E572E340C48B13DB38E85B0EE74"
+   client_id_list = ["sts.amazonaws.com"]
+
+  thumbprint_list = ["9e99a48a9960b14926bb7f3b02e22da2b0ab7280"]
+
+  tags = {
+    Name = "${var.project}-${var.env}-eks-oidc"
+  }
+}
+
 resource "aws_iam_role" "github_actions" {
   name = "${var.project}-${var.env}-github-actions"
   assume_role_policy = jsonencode({
@@ -109,21 +120,139 @@ resource "aws_iam_role" "eks_node" {
 }
 
 resource "aws_iam_role_policy_attachment" "eks_node_policy" {
-    role = aws_iam_role.eks_node.name
-    policy_arn = "arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy"
-  
+  role       = aws_iam_role.eks_node.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy"
+
 }
 
 resource "aws_iam_role_policy_attachment" "eks_cni_policy" {
-  role = aws_iam_role.eks_node.name
+  role       = aws_iam_role.eks_node.name
   policy_arn = "arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy"
 
 }
 
 resource "aws_iam_role_policy_attachment" "eks_ecr_policy" {
-  role = aws_iam_role.eks_node.name
+  role       = aws_iam_role.eks_node.name
   policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"
 }
+
+
+resource "aws_iam_role" "external_secret" {
+  name = "${var.project}-${var.env}-external-secret"
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Principal = {
+          Federated = aws_iam_openid_connect_provider.eks.arn
+        }
+        Action = "sts:AssumeRoleWithWebIdentity"
+        Condition = {
+          StringEquals = {
+            "${aws_iam_openid_connect_provider.eks.url}:aud" = "sts.amazonaws.com"
+            "${aws_iam_openid_connect_provider.eks.url}:sub" = "system:serviceaccount:external-secrets:external-secrets-sa"
+          }
+        }
+      }
+    ]
+  })
+  tags = {
+    Name = "${var.project}-${var.env}-external-secrets-role"
+  }
+}
+
+resource "aws_iam_role_policy" "external_secret" {
+  role = aws_iam_role.external_secret.id
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "secretsmanager:GetSecretValue",
+          "secretsmanager:DescribeSecret",
+          "secretsmanager:ListSecrets"
+        ]
+        Resource = "arn:aws:secretsmanager:ap-south-1:${var.aws_account_id}:secret:${var.project}-*"
+
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role" "alb_controller_role" {
+  name = "${var.project}-${var.env}-alb-controller"
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Principal = {
+          Federated = aws_iam_openid_connect_provider.eks.arn
+        }
+        Action = "sts:AssumeRoleWithWebIdentity"
+        Condition = {
+          StringEquals = {
+              "${aws_iam_openid_connect_provider.eks.url}:aud" = "sts.amazonaws.com"
+            "${aws_iam_openid_connect_provider.eks.url}:sub" = "system:serviceaccount:kube-system:aws-load-balancer-controller"
+          }
+        }
+      }
+    ]
+  })
+  tags = {
+    Name = "${var.project}-${var.env}-alb-controller-role"
+  }
+
+}
+
+resource "aws_iam_role_policy_attachment" "alb_controller_role" {
+  role = aws_iam_role.alb_controller_role.id
+  policy_arn = "arn:aws:iam::aws:policy/ElasticLoadBalancingFullAccess"
+}
+
+resource "aws_iam_role_policy" "alb_controller" {
+  name = "${var.project}-${var.env}-alb-controller-policy"
+  role = aws_iam_role.alb_controller_role.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "ec2:DescribeVpcs",
+          "ec2:DescribeSubnets",
+          "ec2:DescribeSecurityGroups",
+          "ec2:DescribeInstances",
+          "ec2:DescribeInternetGateways",
+          "ec2:DescribeAvailabilityZones",
+          "ec2:DescribeAccountAttributes",
+          "ec2:DescribeAddresses",
+          "ec2:DescribeTags",
+          "ec2:CreateSecurityGroup",
+          "ec2:CreateTags",
+          "ec2:AuthorizeSecurityGroupIngress",
+          "ec2:RevokeSecurityGroupIngress",
+          "ec2:DeleteSecurityGroup",
+          "elasticloadbalancing:*",
+          "cognito-idp:DescribeUserPoolClient",
+          "acm:ListCertificates",
+          "acm:DescribeCertificate",
+          "iam:ListServerCertificates",
+          "iam:GetServerCertificate",
+          "waf-regional:*",
+          "wafv2:*",
+          "shield:*"
+        ]
+        Resource = "*"
+      }
+    ]
+  })
+}
+
+
 
 
 
