@@ -158,7 +158,5 @@ jobs:
              --body "Automated image update from the CI pipeline .Version: ${VERSION}" \
              --base main \
              --head $BRANCH
-        env:
-          GH_TOKEN: ${{ secrets.GITOPS_TOKEN }}
-          
+        
         
