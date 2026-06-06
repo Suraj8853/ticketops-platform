@@ -141,6 +141,7 @@ jobs:
            cd gitops
            git config user.email "surajpai8853@gmail.com"
            git config user.name "Suraj8853"
+           git remote set-url origin https://x-access-token:${{ secrets.GITOPS_TOKEN }}@github.com/Suraj8853/ticketops-gitops.git
            git checkout -b $BRANCH
            git add .
            if git diff --staged --quiet; then
