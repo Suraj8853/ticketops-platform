@@ -1,5 +1,4 @@
 -- TicketOps Database Schema
- 
 CREATE TABLE IF NOT EXISTS events (
   id          SERIAL PRIMARY KEY,
   title       VARCHAR(255) NOT NULL,
@@ -13,32 +12,36 @@ CREATE TABLE IF NOT EXISTS events (
   created_at  TIMESTAMP DEFAULT NOW(),
   updated_at  TIMESTAMP DEFAULT NOW()
 );
- 
+
 CREATE TABLE IF NOT EXISTS seats (
-  id         SERIAL PRIMARY KEY,
-  event_id   INTEGER REFERENCES events(id) ON DELETE CASCADE,
-  row_label  VARCHAR(5) NOT NULL,
-  seat_no    INTEGER NOT NULL,
-  seat_code  VARCHAR(10) NOT NULL,
-  status     VARCHAR(20) NOT NULL DEFAULT 'available',
+  id           SERIAL PRIMARY KEY,
+  event_id     INTEGER REFERENCES events(id) ON DELETE CASCADE,
+  row_label    VARCHAR(5) NOT NULL,
+  seat_no      INTEGER NOT NULL,
+  seat_code    VARCHAR(10) NOT NULL,
+  status       VARCHAR(20) NOT NULL DEFAULT 'available',
+  locked_until TIMESTAMP,
   UNIQUE(event_id, seat_code)
 );
- 
+
 CREATE TABLE IF NOT EXISTS bookings (
-  id          SERIAL PRIMARY KEY,
-  booking_ref VARCHAR(20) UNIQUE NOT NULL,
-  event_id    INTEGER REFERENCES events(id),
+  id             SERIAL PRIMARY KEY,
+  booking_ref    VARCHAR(20) UNIQUE NOT NULL,
+  event_id       INTEGER REFERENCES events(id),
   customer_name  VARCHAR(255) NOT NULL,
   customer_email VARCHAR(255) NOT NULL,
-  seats       TEXT[] NOT NULL,
-  total_amount NUMERIC(10, 2) NOT NULL,
-  status      VARCHAR(20) NOT NULL DEFAULT 'pending',
-  qr_url      TEXT,
-  created_at  TIMESTAMP DEFAULT NOW(),
-  updated_at  TIMESTAMP DEFAULT NOW()
+  seats          TEXT[] NOT NULL,
+  total_amount   NUMERIC(10, 2) NOT NULL,
+  status         VARCHAR(20) NOT NULL DEFAULT 'pending',
+  qr_url         TEXT,
+  created_at     TIMESTAMP DEFAULT NOW(),
+  updated_at     TIMESTAMP DEFAULT NOW()
 );
- 
--- seed some events for local dev
+
+-- Add locked_until column if not exists (for existing databases)
+ALTER TABLE seats ADD COLUMN IF NOT EXISTS locked_until TIMESTAMP;
+
+-- Seed data
 INSERT INTO events (title, description, category, venue, event_date, price, total_seats, status)
 VALUES
   ('Arctic Monkeys Live', 'World tour 2025', 'concert', 'JLN Stadium, Delhi', '2025-06-14 19:00:00', 2499, 600, 'live'),
