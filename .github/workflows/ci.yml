@@ -135,13 +135,16 @@ jobs:
             fi
           done
       - name: Create PR
+        env:
+         GH_TOKEN: ${{ secrets.GITOPS_TOKEN }}
+         GITOPS_TOKEN: ${{ secrets.GITOPS_TOKEN }}
         run: |
            VERSION=${{ needs.release.outputs.new_release_version }}
            BRANCH="update-images-${VERSION}"
            cd gitops
            git config user.email "surajpai8853@gmail.com"
            git config user.name "Suraj8853"
-           git remote set-url origin https://x-access-token:${{ secrets.GITOPS_TOKEN }}@github.com/Suraj8853/ticketops-gitops.git
+           git remote set-url origin https://x-access-token:${GITOPS_TOKEN}@github.com/Suraj8853/ticketops-gitops.git
            git checkout -b $BRANCH
            git add .
            if git diff --staged --quiet; then
