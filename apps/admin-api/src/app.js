@@ -37,8 +37,8 @@ app.get('/ready', async (req, res) => {
 });
 
 app.get('/metrics', async (req, res) => {
-  res.set('Content-Type', client.contentType);
-  res.end(await client.metrics());
+  res.set('Content-Type', client.register.contentType);
+  res.end(await client.register.metrics());
 });
 
 app.use('/auth', authRoutes);

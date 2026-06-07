@@ -47,8 +47,8 @@ app.get('/ready', async (req, res) => {
  
 // ── Prometheus metrics endpoint ──
 app.get('/metrics', async (req, res) => {
-  res.set('Content-Type', client.contentType);
-  res.end(await client.metrics());
+  res.set('Content-Type', client.register.contentType);
+  res.end(await client.register.metrics());
 });
  
 // ── API routes ──
