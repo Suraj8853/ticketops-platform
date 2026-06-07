@@ -6,6 +6,7 @@ const morgan = require('morgan');
 const rateLimit = require('express-rate-limit');
  
 const requestId = require('./middleware/requestId');
+const metricsMiddleware = require('./middleware/metrics');
 const errorHandler = require('./middleware/errorHandler');
 const eventsRoutes = require('./routes/events.routes');
 const bookingsRoutes = require('./routes/bookings.routes');
@@ -24,6 +25,7 @@ app.use(express.json());
  
 // ── request ID (Loki tracing) ──
 app.use(requestId);
+app.use(metricsMiddleware);
  
 // ── HTTP logging ──
 app.use(morgan('combined'));

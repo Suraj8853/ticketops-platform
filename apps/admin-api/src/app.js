@@ -5,6 +5,7 @@ const cors = require('cors');
 const morgan = require('morgan');
 const rateLimit = require('express-rate-limit');
 const requestId = require('./middleware/requestId');
+const metricsMiddleware = require('./middleware/metrics');
 const errorHandler = require('./middleware/errorHandler');
 const jwtAuth = require('./middleware/jwtAuth');
 const eventsRoutes = require('./routes/events.routes');
@@ -20,6 +21,7 @@ app.use(helmet());
 app.use(cors());
 app.use(express.json());
 app.use(requestId);
+app.use(metricsMiddleware);
 app.use(morgan('combined'));
 app.use(rateLimit({ windowMs: 60 * 1000, max: 50 }));
 
