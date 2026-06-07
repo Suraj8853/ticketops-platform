@@ -133,7 +133,12 @@ jobs:
               sed -i "s|ticketops-dev-${service}:v[0-9]*\.[0-9]*\.[0-9]*|ticketops-dev-${service}:${VERSION}|g" "$FILE"
               echo "Updated ${service} to ${VERSION}"
             fi
-          done
+            done
+             sed -i "s|ticketops-dev-events-api:v[0-9]*\.[0-9]*\.[0-9]*|ticketops-dev-events-api:${VERSION}|g" \
+            manifests/jobs/db-migrate.yaml \
+            manifests/jobs/seat-lock-expiry.yaml
+            echo "Updated jobs to ${VERSION}"
+          
       - name: Create PR
         env:
          GH_TOKEN: ${{ secrets.GITOPS_TOKEN }}

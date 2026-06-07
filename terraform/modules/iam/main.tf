@@ -8,7 +8,7 @@ resource "aws_iam_openid_connect_provider" "github" {
 }
 
 resource "aws_iam_openid_connect_provider" "eks" {
-  url = "https://oidc.eks.ap-south-1.amazonaws.com/id/B6F84E572E340C48B13DB38E85B0EE74"
+  url = var.eks_oidc_issuer_url
    client_id_list = ["sts.amazonaws.com"]
 
   thumbprint_list = ["9e99a48a9960b14926bb7f3b02e22da2b0ab7280"]
@@ -16,6 +16,10 @@ resource "aws_iam_openid_connect_provider" "eks" {
   tags = {
     Name = "${var.project}-${var.env}-eks-oidc"
   }
+}
+
+resource "terraform_data" "eks_oidc_url" {
+  input = var.eks_oidc_issuer_url
 }
 
 resource "aws_iam_role" "github_actions" {
