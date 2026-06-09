@@ -41,17 +41,6 @@ CREATE TABLE IF NOT EXISTS bookings (
 -- Add locked_until column if not exists (for existing databases)
 ALTER TABLE seats ADD COLUMN IF NOT EXISTS locked_until TIMESTAMP;
 
--- Seed data
-INSERT INTO events (title, description, category, venue, event_date, price, total_seats, status)
-VALUES
-  ('Arctic Monkeys Live', 'World tour 2025', 'concert', 'JLN Stadium, Delhi', '2025-06-14 19:00:00', 2499, 600, 'live'),
-  ('IPL Final 2025', 'The big one', 'sports', 'Wankhede Stadium, Mumbai', '2025-06-22 19:30:00', 1200, 400, 'live'),
-  ('Coldplay Music of the Spheres', 'World tour', 'concert', 'DY Patil Stadium, Mumbai', '2025-08-09 18:00:00', 4999, 1200, 'live'),
-  ('AWS Summit India', 'Cloud conference', 'conference', 'Hyderabad International Convention', '2025-07-17 09:00:00', 0, 2000, 'upcoming'),
-  ('Zakir Khan Live', 'Stand up comedy', 'comedy', 'Chowdiah Hall, Bangalore', '2025-08-01 20:00:00', 999, 300, 'live'),
-  ('KubeConf APAC', 'Kubernetes conference', 'conference', 'JNCC, Bangalore', '2025-09-26 09:00:00', 1500, 600, 'upcoming')
-ON CONFLICT (title) DO NOTHING;
-
 -- Add unique constraint on title if not exists (for existing databases)
 DO $$ 
 BEGIN
@@ -66,3 +55,15 @@ BEGIN
     ALTER TABLE events ADD CONSTRAINT events_title_key UNIQUE (title);
   END IF;
 END $$;
+-- Seed data
+INSERT INTO events (title, description, category, venue, event_date, price, total_seats, status)
+VALUES
+  ('Arctic Monkeys Live', 'World tour 2025', 'concert', 'JLN Stadium, Delhi', '2025-06-14 19:00:00', 2499, 600, 'live'),
+  ('IPL Final 2025', 'The big one', 'sports', 'Wankhede Stadium, Mumbai', '2025-06-22 19:30:00', 1200, 400, 'live'),
+  ('Coldplay Music of the Spheres', 'World tour', 'concert', 'DY Patil Stadium, Mumbai', '2025-08-09 18:00:00', 4999, 1200, 'live'),
+  ('AWS Summit India', 'Cloud conference', 'conference', 'Hyderabad International Convention', '2025-07-17 09:00:00', 0, 2000, 'upcoming'),
+  ('Zakir Khan Live', 'Stand up comedy', 'comedy', 'Chowdiah Hall, Bangalore', '2025-08-01 20:00:00', 999, 300, 'live'),
+  ('KubeConf APAC', 'Kubernetes conference', 'conference', 'JNCC, Bangalore', '2025-09-26 09:00:00', 1500, 600, 'upcoming')
+ON CONFLICT (title) DO NOTHING;
+
+
