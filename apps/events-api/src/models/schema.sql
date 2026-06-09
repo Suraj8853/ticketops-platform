@@ -9,7 +9,7 @@ CREATE TABLE IF NOT EXISTS events (
   price       NUMERIC(10, 2) NOT NULL DEFAULT 0,
   total_seats INTEGER NOT NULL,
   status      VARCHAR(20) NOT NULL DEFAULT 'upcoming',
-  UNIQUE(title)
+  UNIQUE(title),
   created_at  TIMESTAMP DEFAULT NOW(),
   updated_at  TIMESTAMP DEFAULT NOW()
 );
