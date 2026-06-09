@@ -9,6 +9,7 @@ CREATE TABLE IF NOT EXISTS events (
   price       NUMERIC(10, 2) NOT NULL DEFAULT 0,
   total_seats INTEGER NOT NULL,
   status      VARCHAR(20) NOT NULL DEFAULT 'upcoming',
+  UNIQUE(title)
   created_at  TIMESTAMP DEFAULT NOW(),
   updated_at  TIMESTAMP DEFAULT NOW()
 );
@@ -50,4 +51,19 @@ VALUES
   ('AWS Summit India', 'Cloud conference', 'conference', 'Hyderabad International Convention', '2025-07-17 09:00:00', 0, 2000, 'upcoming'),
   ('Zakir Khan Live', 'Stand up comedy', 'comedy', 'Chowdiah Hall, Bangalore', '2025-08-01 20:00:00', 999, 300, 'live'),
   ('KubeConf APAC', 'Kubernetes conference', 'conference', 'JNCC, Bangalore', '2025-09-26 09:00:00', 1500, 600, 'upcoming')
-ON CONFLICT DO NOTHING;
+ON CONFLICT (title) DO NOTHING;
+
+-- Add unique constraint on title if not exists (for existing databases)
+DO $$ 
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_constraint 
+    WHERE conname = 'events_title_key'
+  ) THEN
+    -- Delete duplicates first
+    DELETE FROM events a USING events b
+    WHERE a.id > b.id AND a.title = b.title;
+    -- Then add constraint
+    ALTER TABLE events ADD CONSTRAINT events_title_key UNIQUE (title);
+  END IF;
+END $$;
