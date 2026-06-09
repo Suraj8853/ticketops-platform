@@ -16,6 +16,7 @@ resource "aws_eks_node_group" "main" {
   node_role_arn = var.eks_node_role_arn
   cluster_name = aws_eks_cluster.main.name
   subnet_ids = var.private_subnets_ids
+  instance_types = [var.node_instance_type]
   scaling_config {
     min_size = var.node_min_size
     max_size = var.node_max_size

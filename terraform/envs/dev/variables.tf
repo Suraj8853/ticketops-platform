@@ -68,3 +68,8 @@ variable "admin_password" {
   type        = string
   sensitive   = true
 }
+variable "slack_webhook_url" {
+  description = "Slack webhook URL for Alertmanager notifications"
+  type        = string
+  sensitive   = true
+}
