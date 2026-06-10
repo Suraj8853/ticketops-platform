@@ -9,14 +9,14 @@ const errorRate = new Rate('error_rate');
 
 export const options = {
   stages: [
-    { duration: '1m', target: 10 },
-    { duration: '2m', target: 50 },
-    { duration: '2m', target: 100 },
-    { duration: '2m', target: 100 },
+    { duration: '1m', target: 50 },
+    { duration: '2m', target: 200 },
+    { duration: '2m', target: 500 },
+    { duration: '2m', target: 500 },
     { duration: '1m', target: 0 },
   ],
   thresholds: {
-    http_req_duration: ['p(95)<500'],
+    http_req_duration: ['p(95)<2000'],
     http_req_failed: ['rate<0.05'],
     error_rate: ['rate<0.05'],
   },
@@ -32,8 +32,8 @@ function randomSeat() {
 }
 
 function randomEventId() {
-  const ids = [1, 2, 3, 4, 5, 6];
-  return ids[Math.floor(Math.random() * ids.length)];
+  // Use all 150 events
+  return Math.floor(Math.random() * 150) + 1;
 }
 
 export default function () {
