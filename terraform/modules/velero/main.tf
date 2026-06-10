@@ -45,7 +45,7 @@ resource "aws_iam_role" "velero" {
         Action = "sts:AssumeRoleWithWebIdentity"
         Condition = {
           StringEquals = {
-            "${var.eks_oidc_issuer}:sub" = "system:serviceaccount:velero:velero"
+            "${var.eks_oidc_issuer}:sub" = "system:serviceaccount:velero:${var.velero_sa_name}"
             "${var.eks_oidc_issuer}:aud" = "sts.amazonaws.com"
           }
         }
