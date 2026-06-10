@@ -34,7 +34,10 @@ app.use(morgan('combined'));
 app.use(rateLimit({ windowMs: 60 * 1000, max: 200 }));
  
 // ── health probes (used by Kubernetes liveness + readiness) ──
-app.get('/health', (req, res) => res.json({ status: 'ok', service: 'events-api' }));
+app.get('/health', (req, res) => {
+  console.log('Health check called');
+  res.json({ status: 'ok', service: 'events-api' });
+});
 app.get('/ready', async (req, res) => {
   try {
     const pool = require('./config/db');
