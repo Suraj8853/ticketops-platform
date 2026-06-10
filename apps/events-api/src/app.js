@@ -35,7 +35,7 @@ app.use(rateLimit({ windowMs: 60 * 1000, max: 200 }));
  
 // ── health probes (used by Kubernetes liveness + readiness) ──
 app.get('/health', (req, res) => {
-  console.log('Health check called - v1.8.1');
+  console.log('Health check called - v1.9.1');
   res.json({ status: 'ok', service: 'events-api' });
 });
 app.get('/ready', async (req, res) => {
