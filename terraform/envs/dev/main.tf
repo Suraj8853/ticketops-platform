@@ -79,8 +79,7 @@ module "velero" {
   source                = "../../modules/velero"
   env                   = var.env
   project               = var.project
-  eks_oidc_provider_arn = module.iam.eks_oidc_provider_arn
-  eks_oidc_issuer       = module.iam.eks_oidc_issuer
+  eks_oidc_issuer       = trimprefix(module.eks.cluster_oidc_issuer_url, "https://")
 
 }
 

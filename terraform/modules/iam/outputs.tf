@@ -27,13 +27,3 @@ output "external_secret_role_arn" {
   description = "IAM role ARN for External Secrets Operator"
   value = aws_iam_role.external_secret.arn
 }
-
-output "eks_oidc_provider_arn" {
-  description = "EKS OIDC provider ARN used for IRSA"
-  value       = aws_iam_openid_connect_provider.eks.arn
-}
-
-output "eks_oidc_issuer" {
-  description = "EKS OIDC issuer URL without https://"
-  value       = trimprefix(aws_iam_openid_connect_provider.eks.url, "https://")
-}
