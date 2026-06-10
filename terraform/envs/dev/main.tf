@@ -21,7 +21,7 @@ module "iam" {
   env                 = var.env
   github_org          = var.github_org
   aws_account_id      = var.aws_account_id
-  eks_oidc_issuer_url = module.eks.cluster_oidc_issuer_url
+  eks_oidc_issuer_url = module.iam.eks_oidc_issuer
 
 }
 
@@ -72,6 +72,15 @@ module "app_secrets" {
   project           = var.project
   env               = var.env
   slack_webhook_url = var.slack_webhook_url
+
+}
+
+module "velero" {
+  source                = "../../modules/velero"
+  env                   = var.env
+  project               = var.project
+  eks_oidc_provider_arn = module.iam.eks_oidc_provider_arn
+  eks_oidc_issuer       = module.iam.eks_oidc_issuer
 
 }
 
