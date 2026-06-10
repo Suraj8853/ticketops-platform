@@ -7,19 +7,11 @@ resource "aws_iam_openid_connect_provider" "github" {
   }
 }
 
-resource "aws_iam_openid_connect_provider" "eks" {
-  url = var.eks_oidc_issuer_url
-   client_id_list = ["sts.amazonaws.com"]
 
-  thumbprint_list = ["9e99a48a9960b14926bb7f3b02e22da2b0ab7280"]
 
-  tags = {
-    Name = "${var.project}-${var.env}-eks-oidc"
-  }
-}
-
-resource "terraform_data" "eks_oidc_url" {
-  input = var.eks_oidc_issuer_url
+locals {
+  eks_oidc_issuer = var.eks_oidc_issuer
+  eks_oidc_arn    = var.eks_oidc_arn
 }
 
 resource "aws_iam_role" "github_actions" {
@@ -58,15 +50,16 @@ resource "aws_iam_role_policy" "github_actions" {
       },
       {
         Effect = "Allow"
-        Action = ["ecr:BatchCheckLayerAvailability",
+        Action = [
+          "ecr:BatchCheckLayerAvailability",
           "ecr:GetDownloadUrlForLayer",
           "ecr:BatchGetImage",
           "ecr:InitiateLayerUpload",
           "ecr:UploadLayerPart",
           "ecr:CompleteLayerUpload",
-        "ecr:PutImage"]
+          "ecr:PutImage"
+        ]
         Resource = "arn:aws:ecr:ap-south-1:${var.aws_account_id}:repository/${var.project}-${var.env}-*"
-
       },
       {
         Effect   = "Allow"
@@ -75,9 +68,7 @@ resource "aws_iam_role_policy" "github_actions" {
       }
     ]
   })
-
 }
-
 
 resource "aws_iam_role" "eks_cluster_role" {
   name = "${var.project}-${var.env}-eks-cluster"
@@ -117,7 +108,6 @@ resource "aws_iam_role" "eks_node" {
       }
     ]
   })
-
   tags = {
     Name = "${var.project}-${var.env}-eks-node-role"
   }
@@ -126,20 +116,17 @@ resource "aws_iam_role" "eks_node" {
 resource "aws_iam_role_policy_attachment" "eks_node_policy" {
   role       = aws_iam_role.eks_node.name
   policy_arn = "arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy"
-
 }
 
 resource "aws_iam_role_policy_attachment" "eks_cni_policy" {
   role       = aws_iam_role.eks_node.name
   policy_arn = "arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy"
-
 }
 
 resource "aws_iam_role_policy_attachment" "eks_ecr_policy" {
   role       = aws_iam_role.eks_node.name
   policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"
 }
-
 
 resource "aws_iam_role" "external_secret" {
   name = "${var.project}-${var.env}-external-secret"
@@ -149,13 +136,13 @@ resource "aws_iam_role" "external_secret" {
       {
         Effect = "Allow"
         Principal = {
-          Federated = aws_iam_openid_connect_provider.eks.arn
+          Federated = local.eks_oidc_arn
         }
         Action = "sts:AssumeRoleWithWebIdentity"
         Condition = {
           StringEquals = {
-            "${aws_iam_openid_connect_provider.eks.url}:aud" = "sts.amazonaws.com"
-            "${aws_iam_openid_connect_provider.eks.url}:sub" = "system:serviceaccount:external-secrets:external-secrets-sa"
+            "${local.eks_oidc_issuer}:aud" = "sts.amazonaws.com"
+            "${local.eks_oidc_issuer}:sub" = "system:serviceaccount:external-secrets:external-secrets-sa"
           }
         }
       }
@@ -179,7 +166,6 @@ resource "aws_iam_role_policy" "external_secret" {
           "secretsmanager:ListSecrets"
         ]
         Resource = "arn:aws:secretsmanager:ap-south-1:${var.aws_account_id}:secret:${var.project}-*"
-
       }
     ]
   })
@@ -193,13 +179,13 @@ resource "aws_iam_role" "alb_controller_role" {
       {
         Effect = "Allow"
         Principal = {
-          Federated = aws_iam_openid_connect_provider.eks.arn
+          Federated = local.eks_oidc_arn
         }
         Action = "sts:AssumeRoleWithWebIdentity"
         Condition = {
           StringEquals = {
-              "${aws_iam_openid_connect_provider.eks.url}:aud" = "sts.amazonaws.com"
-            "${aws_iam_openid_connect_provider.eks.url}:sub" = "system:serviceaccount:kube-system:aws-load-balancer-controller"
+            "${local.eks_oidc_issuer}:aud" = "sts.amazonaws.com"
+            "${local.eks_oidc_issuer}:sub" = "system:serviceaccount:kube-system:aws-load-balancer-controller"
           }
         }
       }
@@ -208,18 +194,16 @@ resource "aws_iam_role" "alb_controller_role" {
   tags = {
     Name = "${var.project}-${var.env}-alb-controller-role"
   }
-
 }
 
 resource "aws_iam_role_policy_attachment" "alb_controller_role" {
-  role = aws_iam_role.alb_controller_role.id
+  role       = aws_iam_role.alb_controller_role.id
   policy_arn = "arn:aws:iam::aws:policy/ElasticLoadBalancingFullAccess"
 }
 
 resource "aws_iam_role_policy" "alb_controller" {
   name = "${var.project}-${var.env}-alb-controller-policy"
   role = aws_iam_role.alb_controller_role.id
-
   policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
@@ -255,9 +239,3 @@ resource "aws_iam_role_policy" "alb_controller" {
     ]
   })
 }
-
-
-
-
-
-

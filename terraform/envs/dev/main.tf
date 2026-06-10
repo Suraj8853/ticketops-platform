@@ -1,3 +1,8 @@
+locals {
+  eks_oidc_issuer = trimprefix(module.eks.cluster_oidc_issuer_url, "https://")
+  eks_oidc_arn    = "arn:aws:iam::${var.aws_account_id}:oidc-provider/${local.eks_oidc_issuer}"
+}
+
 module "vpc" {
   source              = "../../modules/vpc"
   project             = var.project
@@ -21,8 +26,9 @@ module "iam" {
   env                 = var.env
   github_org          = var.github_org
   aws_account_id      = var.aws_account_id
-  eks_oidc_issuer_url = module.iam.eks_oidc_issuer
-
+  eks_oidc_issuer_url = module.eks.cluster_oidc_issuer_url
+  eks_oidc_issuer     = local.eks_oidc_issuer
+  eks_oidc_arn        = local.eks_oidc_arn
 }
 
 module "eks" {
@@ -39,7 +45,6 @@ module "eks" {
   node_instance_type   = "t3.large"
 }
 
-
 module "rds" {
   source                     = "../../modules/rds"
   private_subnet_ids         = module.vpc.private_subnet_ids
@@ -51,9 +56,7 @@ module "rds" {
   db_password                = var.db_password
   db_name                    = var.db_name
   db_allocated_storage       = var.db_allocated_storage
-
 }
-
 
 module "elasticache" {
   source                     = "../../modules/elasticache"
@@ -62,8 +65,6 @@ module "elasticache" {
   vpc_id                     = module.vpc.vpc_id
   eks_node_security_group_id = module.eks.eks_node_security_group_id
   private_subnets_ids        = module.vpc.private_subnet_ids
-
-
 }
 
 module "app_secrets" {
@@ -72,15 +73,11 @@ module "app_secrets" {
   project           = var.project
   env               = var.env
   slack_webhook_url = var.slack_webhook_url
-
 }
 
 module "velero" {
-  source                = "../../modules/velero"
-  env                   = var.env
-  project               = var.project
-  eks_oidc_issuer       = trimprefix(module.eks.cluster_oidc_issuer_url, "https://")
-
+  source          = "../../modules/velero"
+  env             = var.env
+  project         = var.project
+  eks_oidc_issuer = local.eks_oidc_issuer
 }
-
-
