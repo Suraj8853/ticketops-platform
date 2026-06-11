@@ -39,9 +39,9 @@ module "eks" {
   public_subnets_ids   = module.vpc.public_subnet_ids
   env                  = var.env
   eks_node_role_arn    = module.iam.eks_node_role_arn
-  node_desired_size    = 4
+  node_desired_size    = 2
   node_min_size        = 1
-  node_max_size        = 4
+  node_max_size        = 6
   node_instance_type   = "t3.large"
 }
 

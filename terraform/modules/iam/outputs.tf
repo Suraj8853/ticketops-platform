@@ -18,3 +18,6 @@ output "oidc_provider_url" {
   description = "OIDC provider URL used by EKS for IRSA"
   value       = aws_iam_openid_connect_provider.github.url
 }
+output "cluster_autoscaler_role_arn" {
+  value = aws_iam_role.cluster_autoscaler.arn
+}

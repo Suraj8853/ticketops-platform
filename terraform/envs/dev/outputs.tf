@@ -31,3 +31,8 @@ output "registry_id" {
    description = "url of aws ecr repositories"
   value = module.ecr.registry_id
 }
+
+output "cluster_autoscaler_role_arn" {
+  description = "Cluster Autoscaler IAM role ARN"
+  value       = module.iam.cluster_autoscaler_role_arn
+}

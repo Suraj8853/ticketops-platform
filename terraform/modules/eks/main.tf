@@ -27,6 +27,8 @@ resource "aws_eks_node_group" "main" {
   }
   tags = {
     Name = "${var.project}-${var.env}-node-group"
+    "k8s.io/cluster-autoscaler/enabled" = "true"
+    "k8s.io/cluster-autoscaler/ticketops-dev-cluster" = "owned"
   }
 
   depends_on = [aws_eks_addon.vpc_cni]
