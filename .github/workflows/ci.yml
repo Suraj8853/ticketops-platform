@@ -78,6 +78,7 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+
       - name: Configure aws credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
@@ -111,6 +112,18 @@ jobs:
         run: |
             docker push ${{ env.ECR_REGISTRY }}/ticketops-dev-${{ matrix.service.name }}:${{ steps.tag.outputs.IMAGE_TAG }}
             docker push  ${{ env.ECR_REGISTRY }}/ticketops-dev-${{ matrix.service.name }}:latest
+      - name: Install Cosign
+        if: github.event_name == 'push'
+        uses: sigstore/cosign-installer@v3
+      - name: Sign Image with Co-Sign
+        if: github.event_name == 'push'
+        env:
+          COSIGN_EXPERIMENTAL: "1"
+        run: |
+          IMAGE="${{ env.ECR_REGISTRY }}/ticketops-dev-${{ matrix.service.name }}:${{ steps.tag.outputs.IMAGE_TAG }}"
+          DIGEST=$(docker inspect --format='{{index .RepoDigests 0}}' $IMAGE | cut -d@ -f2)
+          cosign sign --yes \
+           "${{ env.ECR_REGISTRY }}/ticketops-dev-${{ matrix.service.name }}@${DIGEST}"
   update-gitops:
     name: Update Gitops repo
     runs-on: ubuntu-latest
