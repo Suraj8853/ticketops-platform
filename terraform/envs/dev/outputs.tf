@@ -36,3 +36,7 @@ output "cluster_autoscaler_role_arn" {
   description = "Cluster Autoscaler IAM role ARN"
   value       = module.iam.cluster_autoscaler_role_arn
 }
+output "ticketops_url" {
+  description = "TicketOps platform URL"
+  value       = module.route53.fqdn
+}

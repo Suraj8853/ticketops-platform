@@ -92,3 +92,10 @@ module "secrets_rotation" {
   secret_arn            = module.rds.db_password_secret_arn
  rds_security_group_id = tolist(module.rds.rds_security_group_id)[0]
 }
+
+module "route53" {
+  source = "../../modules/route53"
+  domain_name = "apisuraj.click"
+  subdomain_name = "ticketops"
+  alb_dns_name = "k8s-ticketop-ticketop-beac6174a2-1892759112.ap-south-1.elb.amazonaws.com"
+}
