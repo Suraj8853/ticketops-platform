@@ -66,7 +66,8 @@ resource "aws_iam_role_policy" "github_actions" {
           "ecr:InitiateLayerUpload",
           "ecr:UploadLayerPart",
           "ecr:CompleteLayerUpload",
-          "ecr:PutImage"
+          "ecr:PutImage",
+          "ecr:DescribeImages" 
         ]
         Resource = "arn:aws:ecr:ap-south-1:${var.aws_account_id}:repository/${var.project}-${var.env}-*"
       },
