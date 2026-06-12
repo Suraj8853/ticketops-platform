@@ -297,3 +297,45 @@ resource "aws_iam_role_policy" "cluster_autoscaler" {
     ]
   })
 }
+
+resource "aws_iam_role" "kyverno_ecr" {
+  name = "${var.project}-${var.env}-kyverno-ecr"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Effect = "Allow"
+      Principal = {
+        Federated = aws_iam_openid_connect_provider.eks.arn
+      }
+      Action = "sts:AssumeRoleWithWebIdentity"
+      Condition = {
+        StringEquals = {
+          "${local.eks_oidc_issuer}:sub" = "system:serviceaccount:kyverno:kyverno-admission-controller"
+          "${local.eks_oidc_issuer}:aud" = "sts.amazonaws.com"
+        }
+      }
+    }]
+  })
+}
+
+resource "aws_iam_role_policy" "kyverno_ecr" {
+  name = "${var.project}-${var.env}-kyverno-ecr-policy"
+  role = aws_iam_role.kyverno_ecr.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Effect = "Allow"
+      Action = [
+        "ecr:GetAuthorizationToken",
+        "ecr:BatchCheckLayerAvailability",
+        "ecr:GetDownloadUrlForLayer",
+        "ecr:BatchGetImage",
+        "ecr:DescribeImages",
+        "ecr:ListImages"
+      ]
+      Resource = "*"
+    }]
+  })
+}

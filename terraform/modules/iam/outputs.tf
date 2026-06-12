@@ -21,3 +21,6 @@ output "oidc_provider_url" {
 output "cluster_autoscaler_role_arn" {
   value = aws_iam_role.cluster_autoscaler.arn
 }
+output "kyverno_ecr_role_arn" {
+  value = aws_iam_role.kyverno_ecr.arn
+}
