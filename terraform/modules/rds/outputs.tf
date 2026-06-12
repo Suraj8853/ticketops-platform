@@ -23,3 +23,8 @@ output "rds_security_group_id" {
   description = "security group id of the rds"
   value = aws_db_instance.rds.vpc_security_group_ids
 }
+
+output "db_password_secret_arn" {
+  description = "DB password secret ARN"
+  value       = aws_secretsmanager_secret.db_password.arn
+}
