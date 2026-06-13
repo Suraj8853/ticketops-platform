@@ -151,7 +151,7 @@ jobs:
             fi
             if [ -f "$ROLLOUT_FILE" ]; then
               sed -i "s|ticketops-dev-${service}:v[0-9]*\.[0-9]*\.[0-9]*@sha256:[a-f0-9]*|ticketops-dev-${service}:${VERSION}|g" "$ROLLOUT_FILE"
-              sed -i "s|ticketops-dev-${service}@sha256:[a-f0-9]*|ticketops-dev-${service}:${VERSION}|g" "$ROLLOUT_FILE"
+              sed -i "s|ticketops-dev-events-api:v[0-9]*\.[0-9]*\.[0-9]*\"|ticketops-dev-events-api:${VERSION}\"|g" "$ROLLOUT_FILE"
               sed -i "s|ticketops-dev-${service}:v[0-9]*\.[0-9]*\.[0-9]*$|ticketops-dev-${service}:${VERSION}|g" "$ROLLOUT_FILE"
               echo "Updated ${service} rollout to ${VERSION}"
             fi

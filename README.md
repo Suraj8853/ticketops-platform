@@ -317,9 +317,6 @@ kubectl argo rollouts promote events-api -n ticketops
 
 ![k6 500 Users](docs/screenshots/04-k6-500-users-summary.jpg)
 
-### Grafana — Error Budget Panel
-
-![Error Budget](docs/screenshots/05-grafana-error-budget.png)
 
 ---
 
