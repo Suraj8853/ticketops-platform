@@ -1,0 +1,123 @@
+<svg width="100%" viewBox="0 0 680 820" role="img" xmlns="http://www.w3.org/2000/svg">
+<title>TicketOps Platform Architecture</title>
+<desc>Architecture diagram showing the TicketOps platform on AWS EKS</desc>
+<defs>
+<marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+<path d="M2 1L8 5L2 9" fill="none" stroke="#888" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+</marker>
+<style>
+text { font-family: Arial, sans-serif; fill: #333; }
+.th { font-size: 13px; font-weight: 600; fill: #1a1a1a; }
+.ts { font-size: 11px; fill: #555; }
+.arr { stroke: #888; stroke-width: 0.8; fill: none; }
+.teal rect { fill: #e1f5ee; stroke: #0f6e56; }
+.teal text { fill: #085041; }
+.blue rect { fill: #e6f1fb; stroke: #185fa5; }
+.blue text { fill: #0c447c; }
+.amber rect { fill: #faeeda; stroke: #854f0b; }
+.amber text { fill: #633806; }
+.coral rect { fill: #faece7; stroke: #993c1d; }
+.coral text { fill: #712b13; }
+.purple rect { fill: #eeedfe; stroke: #534ab7; }
+.purple text { fill: #3c3489; }
+.gray rect { fill: #f1efe8; stroke: #5f5e5a; }
+.gray text { fill: #444441; }
+</style>
+</defs>
+
+<text class="th" x="340" y="28" text-anchor="middle" font-size="15">TicketOps Platform — AWS Architecture</text>
+
+<!-- AWS VPC -->
+<rect x="20" y="44" width="500" height="590" rx="14" fill="none" stroke="#888" stroke-width="0.5" stroke-dasharray="6 3" opacity="0.5"/>
+<text class="ts" x="34" y="62">AWS VPC — ap-south-1</text>
+
+<!-- Public subnet -->
+<rect x="36" y="72" width="468" height="44" rx="6" fill="none" stroke="#888" stroke-width="0.5" opacity="0.3"/>
+<text class="ts" x="46" y="88" opacity="0.6">Public subnets (10.0.1-3.0/24)</text>
+
+<text class="ts" x="30" y="105" fill="#555">Users</text>
+<line x1="30" y1="101" x2="50" y2="101" stroke="#888" stroke-width="0.8" marker-end="url(#arrow)"/>
+<g class="blue"><rect x="52" y="92" width="100" height="18" rx="4" stroke-width="0.5"/><text class="ts" x="102" y="105" text-anchor="middle">Route53</text></g>
+<line x1="152" y1="101" x2="184" y2="101" stroke="#888" stroke-width="0.8" marker-end="url(#arrow)"/>
+<g class="blue"><rect x="184" y="92" width="76" height="18" rx="4" stroke-width="0.5"/><text class="ts" x="222" y="105" text-anchor="middle">ALB</text></g>
+
+<!-- Private subnet -->
+<rect x="36" y="124" width="468" height="490" rx="6" fill="none" stroke="#888" stroke-width="0.5" opacity="0.2"/>
+<text class="ts" x="46" y="140" opacity="0.6">Private subnets (10.0.11-13.0/24)</text>
+
+<!-- EKS Cluster -->
+<rect x="48" y="148" width="380" height="380" rx="10" fill="none" stroke="#888" stroke-width="0.5" stroke-dasharray="4 2" opacity="0.4"/>
+<text class="ts" x="60" y="164" opacity="0.7">EKS cluster — ticketops-dev</text>
+
+<line x1="222" y1="110" x2="222" y2="148" stroke="#888" stroke-width="0.8" marker-end="url(#arrow)"/>
+
+<!-- ticketops namespace -->
+<rect x="60" y="170" width="356" height="200" rx="8" fill="none" stroke="#888" stroke-width="0.5" opacity="0.3"/>
+<text class="ts" x="72" y="186" opacity="0.6">ticketops namespace</text>
+
+<g class="teal"><rect x="72" y="194" width="100" height="38" rx="6" stroke-width="0.5"/><text class="th" x="122" y="209" text-anchor="middle">events-api</text><text class="ts" x="122" y="224" text-anchor="middle">Rollout · Blue-Green</text></g>
+<g class="teal"><rect x="192" y="194" width="94" height="38" rx="6" stroke-width="0.5"/><text class="th" x="239" y="209" text-anchor="middle">admin-api</text><text class="ts" x="239" y="224" text-anchor="middle">Deployment · HPA</text></g>
+<g class="teal"><rect x="305" y="194" width="98" height="38" rx="6" stroke-width="0.5"/><text class="th" x="354" y="209" text-anchor="middle">dashboard</text><text class="ts" x="354" y="224" text-anchor="middle">nginx-unprivileged</text></g>
+<g class="gray"><rect x="72" y="246" width="120" height="34" rx="6" stroke-width="0.5"/><text class="th" x="132" y="260" text-anchor="middle">bookings-worker</text><text class="ts" x="132" y="273" text-anchor="middle">Redis queue</text></g>
+<g class="gray"><rect x="208" y="246" width="100" height="34" rx="6" stroke-width="0.5"/><text class="th" x="258" y="260" text-anchor="middle">pgbouncer</text><text class="ts" x="258" y="273" text-anchor="middle">connection pool</text></g>
+<g class="gray"><rect x="72" y="296" width="120" height="34" rx="6" stroke-width="0.5"/><text class="th" x="132" y="310" text-anchor="middle">seat-lock-expiry</text><text class="ts" x="132" y="323" text-anchor="middle">CronJob · 1min</text></g>
+<g class="gray"><rect x="208" y="296" width="100" height="34" rx="6" stroke-width="0.5"/><text class="th" x="258" y="310" text-anchor="middle">db-migrate</text><text class="ts" x="258" y="323" text-anchor="middle">PreSync Hook</text></g>
+<g class="purple"><rect x="320" y="246" width="84" height="34" rx="6" stroke-width="0.5"/><text class="th" x="362" y="260" text-anchor="middle">HPA</text><text class="ts" x="362" y="273" text-anchor="middle">2→10 pods</text></g>
+<g class="purple"><rect x="320" y="296" width="84" height="34" rx="6" stroke-width="0.5"/><text class="th" x="362" y="310" text-anchor="middle">Cluster CA</text><text class="ts" x="362" y="323" text-anchor="middle">1→6 nodes</text></g>
+
+<!-- Observability -->
+<rect x="60" y="380" width="356" height="50" rx="8" fill="none" stroke="#888" stroke-width="0.5" opacity="0.3"/>
+<text class="ts" x="72" y="396" opacity="0.6">monitoring namespace</text>
+<g class="amber"><rect x="72" y="400" width="80" height="24" rx="4" stroke-width="0.5"/><text class="ts" x="112" y="416" text-anchor="middle">Prometheus</text></g>
+<g class="amber"><rect x="162" y="400" width="64" height="24" rx="4" stroke-width="0.5"/><text class="ts" x="194" y="416" text-anchor="middle">Grafana</text></g>
+<g class="amber"><rect x="236" y="400" width="44" height="24" rx="4" stroke-width="0.5"/><text class="ts" x="258" y="416" text-anchor="middle">Loki</text></g>
+<g class="amber"><rect x="290" y="400" width="56" height="24" rx="4" stroke-width="0.5"/><text class="ts" x="318" y="416" text-anchor="middle">Alertmanager</text></g>
+<g class="amber"><rect x="356" y="400" width="54" height="24" rx="4" stroke-width="0.5"/><text class="ts" x="383" y="416" text-anchor="middle">Fluent Bit</text></g>
+
+<!-- Security -->
+<g class="coral"><rect x="60" y="442" width="170" height="24" rx="4" stroke-width="0.5"/><text class="ts" x="145" y="458" text-anchor="middle">Kyverno · 3 replicas · Enforce</text></g>
+<g class="coral"><rect x="240" y="442" width="176" height="24" rx="4" stroke-width="0.5"/><text class="ts" x="328" y="458" text-anchor="middle">ExternalSecrets Operator</text></g>
+
+<!-- AWS Managed Services -->
+<g class="blue"><rect x="448" y="170" width="120" height="44" rx="6" stroke-width="0.5"/><text class="th" x="508" y="188" text-anchor="middle">RDS PostgreSQL</text><text class="ts" x="508" y="204" text-anchor="middle">password rotation</text></g>
+<g class="blue"><rect x="448" y="230" width="120" height="44" rx="6" stroke-width="0.5"/><text class="th" x="508" y="248" text-anchor="middle">ElastiCache</text><text class="ts" x="508" y="264" text-anchor="middle">Redis · seat locks</text></g>
+<g class="blue"><rect x="448" y="290" width="120" height="44" rx="6" stroke-width="0.5"/><text class="th" x="508" y="308" text-anchor="middle">Secrets Manager</text><text class="ts" x="508" y="324" text-anchor="middle">+ Lambda rotation</text></g>
+<g class="blue"><rect x="448" y="350" width="120" height="34" rx="6" stroke-width="0.5"/><text class="th" x="508" y="364" text-anchor="middle">ECR</text><text class="ts" x="508" y="378" text-anchor="middle">VPC endpoint</text></g>
+
+<line x1="310" y1="263" x2="446" y2="192" stroke="#888" stroke-width="0.5" marker-end="url(#arrow)"/>
+<line x1="194" y1="263" x2="446" y2="252" stroke="#888" stroke-width="0.5" marker-end="url(#arrow)"/>
+<line x1="418" y1="454" x2="446" y2="308" stroke="#888" stroke-width="0.5" marker-end="url(#arrow)" stroke-dasharray="3 2"/>
+
+<!-- Velero -->
+<g class="gray"><rect x="48" y="544" width="120" height="34" rx="6" stroke-width="0.5"/><text class="th" x="108" y="558" text-anchor="middle">Velero</text><text class="ts" x="108" y="571" text-anchor="middle">S3 backups · daily</text></g>
+
+<!-- CI/CD Flow -->
+<text class="th" x="340" y="660" text-anchor="middle" font-size="13">CI/CD + GitOps Flow</text>
+<g class="gray"><rect x="20" y="672" width="120" height="44" rx="6" stroke-width="0.5"/><text class="th" x="80" y="690" text-anchor="middle">GitHub Actions</text><text class="ts" x="80" y="706" text-anchor="middle">OIDC · Trivy · Cosign</text></g>
+<g class="blue"><rect x="178" y="672" width="80" height="44" rx="6" stroke-width="0.5"/><text class="th" x="218" y="690" text-anchor="middle">ECR</text><text class="ts" x="218" y="706" text-anchor="middle">image signed</text></g>
+<g class="purple"><rect x="296" y="672" width="110" height="44" rx="6" stroke-width="0.5"/><text class="th" x="351" y="690" text-anchor="middle">GitOps repo</text><text class="ts" x="351" y="706" text-anchor="middle">ticketops-gitops</text></g>
+<g class="purple"><rect x="444" y="672" width="100" height="44" rx="6" stroke-width="0.5"/><text class="th" x="494" y="690" text-anchor="middle">ArgoCD</text><text class="ts" x="494" y="706" text-anchor="middle">App of Apps</text></g>
+<g class="teal"><rect x="582" y="672" width="78" height="44" rx="6" stroke-width="0.5"/><text class="th" x="621" y="690" text-anchor="middle">EKS</text><text class="ts" x="621" y="706" text-anchor="middle">Blue-Green</text></g>
+
+<line x1="140" y1="694" x2="176" y2="694" stroke="#888" stroke-width="0.8" marker-end="url(#arrow)"/>
+<line x1="258" y1="694" x2="294" y2="694" stroke="#888" stroke-width="0.8" marker-end="url(#arrow)"/>
+<line x1="406" y1="694" x2="442" y2="694" stroke="#888" stroke-width="0.8" marker-end="url(#arrow)"/>
+<line x1="544" y1="694" x2="580" y2="694" stroke="#888" stroke-width="0.8" marker-end="url(#arrow)"/>
+
+<text class="ts" x="155" y="688" text-anchor="middle" fill="#555">push</text>
+<text class="ts" x="275" y="688" text-anchor="middle" fill="#555">PR</text>
+<text class="ts" x="425" y="688" text-anchor="middle" fill="#555">sync</text>
+<text class="ts" x="563" y="688" text-anchor="middle" fill="#555">deploy</text>
+
+<!-- Legend -->
+<rect x="20" y="740" width="10" height="10" rx="2" fill="#e1f5ee" stroke="#0f6e56"/>
+<text class="ts" x="36" y="750">Microservices</text>
+<rect x="130" y="740" width="10" height="10" rx="2" fill="#e6f1fb" stroke="#185fa5"/>
+<text class="ts" x="146" y="750">AWS managed</text>
+<rect x="248" y="740" width="10" height="10" rx="2" fill="#faeeda" stroke="#854f0b"/>
+<text class="ts" x="264" y="750">Observability</text>
+<rect x="356" y="740" width="10" height="10" rx="2" fill="#faece7" stroke="#993c1d"/>
+<text class="ts" x="372" y="750">Security</text>
+<rect x="432" y="740" width="10" height="10" rx="2" fill="#eeedfe" stroke="#534ab7"/>
+<text class="ts" x="448" y="750">GitOps / Autoscaling</text>
+</svg>
