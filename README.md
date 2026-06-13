@@ -283,7 +283,7 @@ kubectl argo rollouts promote events-api -n ticketops
 
 ### Live Application
 
-![Events Page](docs/screenshots/events-page.jpg)
+![Events Page](docs/screenshots/events-page.png)
 
 ### ArgoCD — All apps synced and healthy
 
@@ -299,15 +299,15 @@ kubectl argo rollouts promote events-api -n ticketops
 
 ### Grafana — Request Rate during load test
 
-![Request Rate](docs/screenshots/01-request-rate.png)
+![Request Rate](docs/screenshots/01-request-rate.jpg)
 
 ### Grafana — Full SLO Dashboard
 
-![Full Dashboard](docs/screenshots/02-full-dashboard.png)
+![Full Dashboard](docs/screenshots/02-full-dashboard.jpg)
 
 ### Grafana — SLO Dashboard under 500 VU load
 
-![Full Dashboard Under Load](docs/screenshots/02-full-dashboard.1-load.png)
+![Full Dashboard Under Load](docs/screenshots/02-full-dashboard.1-load.jpg)
 
 ### HPA Scaling — events-api 2→7 pods at 122% CPU
 
@@ -315,7 +315,7 @@ kubectl argo rollouts promote events-api -n ticketops
 
 ### k6 — 500 VU load test summary (96,999 requests, 1,731 bookings)
 
-![k6 500 Users](docs/screenshots/04-k6-500-users-summary.png)
+![k6 500 Users](docs/screenshots/04-k6-500-users-summary.jpg)
 
 ### Grafana — Error Budget Panel
 
