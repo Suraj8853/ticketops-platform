@@ -31,7 +31,7 @@ app.use(metricsMiddleware);
 app.use(morgan('combined'));
  
 // ── rate limiting ──
-app.use(rateLimit({ windowMs: 60 * 1000, max: 200 }));
+app.use(rateLimit({ windowMs: 60 * 1000, max: 10000 }));
  
 // ── health probes (used by Kubernetes liveness + readiness) ──
 app.get('/health', (req, res) => {

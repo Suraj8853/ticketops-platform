@@ -23,7 +23,7 @@ app.use(express.json());
 app.use(requestId);
 app.use(metricsMiddleware);
 app.use(morgan('combined'));
-app.use(rateLimit({ windowMs: 60 * 1000, max: 50 }));
+app.use(rateLimit({ windowMs: 60 * 1000, max: 10000 }));
 
 app.get('/health', (req, res) => res.json({ status: 'ok', service: 'admin-api' }));
 app.get('/ready', async (req, res) => {
