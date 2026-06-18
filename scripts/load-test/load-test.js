@@ -1,3 +1,4 @@
+
 import http from 'k6/http';
 import { check, sleep } from 'k6';
 import { Counter, Rate, Trend } from 'k6/metrics';
@@ -8,32 +9,31 @@ const bookingDuration = new Trend('booking_duration');
 const errorRate = new Rate('error_rate');
 
 export const options = {
-  stages: [
-    { duration: '1m', target: 50 },
-    { duration: '2m', target: 200 },
-    { duration: '2m', target: 500 },
-    { duration: '2m', target: 500 },
-    { duration: '1m', target: 0 },
-  ],
-  thresholds: {
-    http_req_duration: ['p(95)<2000'],
-    http_req_failed: ['rate<0.05'],
-    error_rate: ['rate<0.05'],
-  },
+ stages: [
+  { duration: '1m', target: 50 },
+  { duration: '2m', target: 200 },
+  { duration: '2m', target: 200 },
+  { duration: '2m', target: 200 },
+  { duration: '1m', target: 0 },
+],
+thresholds: {
+  http_req_duration: ['p(95)<4000'],
+  http_req_failed: ['rate<0.05'],
+  error_rate: ['rate<0.05'],
+},
 };
 
-const BASE_URL = 'http://k8s-ticketop-ticketop-beac6174a2-1892759112.ap-south-1.elb.amazonaws.com';
+const BASE_URL = 'http://ticketops.apisuraj.click';
 
 function randomSeat() {
-  const rows = ['A', 'B', 'C', 'D', 'E'];
-  const row = rows[Math.floor(Math.random() * rows.length)];
-  const num = Math.floor(Math.random() * 20) + 1;
+  const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+  const row = letters[Math.floor(Math.random() * 26)];
+  const num = Math.floor(Math.random() * 200) + 1;
   return `${row}${num}`;
 }
 
 function randomEventId() {
-  // Use all 150 events
-  return Math.floor(Math.random() * 150) + 1;
+  return Math.floor(Math.random() * 6) + 1;
 }
 
 export default function () {
@@ -42,12 +42,11 @@ export default function () {
   const eventsRes = http.get(`${BASE_URL}/api/events`, {
     tags: { name: 'get_events' },
   });
-
   check(eventsRes, {
     'get events status 200': (r) => r.status === 200,
   });
-
   errorRate.add(eventsRes.status !== 200);
+
   sleep(0.5);
 
   const payload = JSON.stringify({

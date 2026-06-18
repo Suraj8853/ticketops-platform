@@ -6,6 +6,15 @@ const logger = require('../utils/logger');
 const listEvents = async (req, res, next) => {
   try {
     const { category } = req.query;
+    const cacheKey = category ? `events:category:${category}` : 'events:all';
+
+    // check Redis cache first
+    const cached = await redis.get(cacheKey);
+    if (cached) {
+      logger.info({ message: 'events cache hit', request_id: req.requestId, cacheKey });
+      return res.json(JSON.parse(cached));
+    }
+
     let query = `
       SELECT e.*,
         COUNT(s.id) FILTER (WHERE s.status = 'available') AS available_seats
@@ -20,6 +29,9 @@ const listEvents = async (req, res, next) => {
     query += ` GROUP BY e.id ORDER BY e.event_date ASC`;
 
     const { rows } = await pool.query(query, params);
+
+    // cache for 30 seconds
+    await redis.setex(cacheKey, 30, JSON.stringify({ events: rows }));
 
     logger.info({ message: 'events listed', request_id: req.requestId, count: rows.length });
     res.json({ events: rows });
@@ -57,7 +69,6 @@ const getEvent = async (req, res, next) => {
 const getSeats = async (req, res, next) => {
   try {
     const { id } = req.params;
-
     const { rows } = await pool.query(
       'SELECT * FROM seats WHERE event_id = $1 ORDER BY row_label, seat_no',
       [id]
@@ -66,7 +77,6 @@ const getSeats = async (req, res, next) => {
     // check Redis for any held seats
     const heldKeys = await redis.keys(`seat:held:${id}:*`);
     const heldSeats = heldKeys.map((k) => k.split(':')[3]);
-
     const seats = rows.map((seat) => ({
       ...seat,
       status: heldSeats.includes(seat.seat_code) ? 'held' : seat.status,
