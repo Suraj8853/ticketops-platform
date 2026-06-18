@@ -24,3 +24,7 @@ output "cluster_autoscaler_role_arn" {
 output "kyverno_ecr_role_arn" {
   value = aws_iam_role.kyverno_ecr.arn
 }
+
+output "bookings_worker_role_arn" {
+  value = aws_iam_role.bookings_worker.arn
+}

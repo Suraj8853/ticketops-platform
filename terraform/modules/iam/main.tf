@@ -339,3 +339,53 @@ resource "aws_iam_role_policy" "kyverno_ecr" {
     }]
   })
 }
+
+
+resource "aws_iam_role" "bookings_worker" {
+  name = "${var.project}-${var.env}-bookings-worker"
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Principal = {
+          Federated = local.eks_oidc_arn
+        }
+        Action = "sts:AssumeRoleWithWebIdentity"
+        Condition = {
+          StringEquals = {
+            "${local.eks_oidc_issuer}:aud" = "sts.amazonaws.com"
+            "${local.eks_oidc_issuer}:sub" = "system:serviceaccount:ticketops:bookings-worker-sa"
+          }
+        }
+      }
+    ]
+  })
+  tags = {
+    Name = "${var.project}-${var.env}-bookings-worker-role"
+  }
+}
+
+resource "aws_iam_role_policy" "bookings_worker" {
+  name = "${var.project}-${var.env}-bookings-worker-s3-policy"
+  role = aws_iam_role.bookings_worker.id
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "s3:PutObject",
+          "s3:GetObject",
+          "s3:DeleteObject"
+        ]
+        Resource = "arn:aws:s3:::${var.project}-qr-codes/*"
+      },
+      {
+        Effect   = "Allow"
+        Action   = ["s3:ListBucket"]
+        Resource = "arn:aws:s3:::${var.project}-qr-codes"
+      }
+    ]
+  })
+}

@@ -99,3 +99,10 @@ module "route53" {
   subdomain_name = "ticketops"
   alb_dns_name = "k8s-ticketop-ticketop-beac6174a2-1892759112.ap-south-1.elb.amazonaws.com"
 }
+
+module "s3_qr_codes" {
+  source      = "../../modules/s3"
+  project     = var.project
+  env         = var.env
+  bucket_name = "qr-codes"
+}
