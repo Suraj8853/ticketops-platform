@@ -349,7 +349,7 @@ kubectl argo rollouts promote events-api -n ticketops
 
 ### k6 — 200 VU stress test summary
 
-![k6 200 Users](docs/screenshots/04-k6-500-users-summary.jpg)
+![k6 200 Users](docs/screenshots/04-k6-500-users-summary.png)
 
 ---
 
