@@ -341,11 +341,11 @@ kubectl argo rollouts promote events-api -n ticketops
 
 ### Grafana — SLO Dashboard under load
 
-![Full Dashboard Under Load](docs/screenshots/02-full-dashboard.1-load.png)
+![Full Dashboard Under Load](docs/screenshots/02-full-dashboard.1-load.jpg)
 
 ### HPA Scaling — events-api scale-up under load
 
-![HPA Scaling](docs/screenshots/03-hpa-scaling-2-to-7.jpg)
+![HPA Scaling](docs/screenshots/03-hpa-scaling-2-to-7.png)
 
 ### k6 — 200 VU stress test summary
 
