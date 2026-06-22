@@ -1,7 +1,7 @@
 import React from 'react';
 import useStore from '../../store/useStore';
 
-const ROWS = ['A','B','C','D','E','F','G','H'];
+const ROWS = ['A','B','C','D','E'];
 
 const SeatMap = ({ seats, eventId }) => {
   const { selectedSeats, addSeat, removeSeat } = useStore();
